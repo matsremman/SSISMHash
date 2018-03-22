@@ -22,7 +22,7 @@ namespace GenerateSSISPackage
 {
     class Program
     {
-        static void Main(string[]() args)
+        static void Main(string[] args)
         {
             String lineageIDs = string.Empty;
             Package package;
@@ -53,11 +53,11 @@ namespace GenerateSSISPackage
 
             // Configure it to read from sys.databases
             srcDesignTimeComponent.SetComponentProperty("AccessMode", 0);
-            srcDesignTimeComponent.SetComponentProperty("OpenRowset", "[sys](sys).[databases](databases)");
+            srcDesignTimeComponent.SetComponentProperty("OpenRowset", "[sys].[databases]");
 
             // Set the connection manager
-            srcComponent.RuntimeConnectionCollection[0](0).ConnectionManager = DtsConvert.GetExtendedInterface(connection);
-            srcComponent.RuntimeConnectionCollection[0](0).ConnectionManagerID = connection.ID;
+            srcComponent.RuntimeConnectionCollection[0].ConnectionManager = DtsConvert.GetExtendedInterface(connection);
+            srcComponent.RuntimeConnectionCollection[0].ConnectionManagerID = connection.ID;
 
             // Retrieve the column metadata
             srcDesignTimeComponent.AcquireConnections(null);
@@ -80,7 +80,7 @@ namespace GenerateSSISPackage
             // Name it
             metaDataMultipleHash.Name = "Multiple Hash Test";
             // Assign it to the Multiple Hash component.
-            metaDataMultipleHash.ComponentClassID = app.PipelineComponentInfos["Martin.SQLServer.Dts.MultipleHash, MultipleHash2008, Version=1.0.0.0, Culture=neutral, PublicKeyToken=51c551904274ab44"](_Martin.SQLServer.Dts.MultipleHash,-MultipleHash2008,-Version=1.0.0.0,-Culture=neutral,-PublicKeyToken=51c551904274ab44_).CreationName;
+            metaDataMultipleHash.ComponentClassID = app.PipelineComponentInfos["Martin.SQLServer.Dts.MultipleHash, MultipleHash2008, Version=1.0.0.0, Culture=neutral, PublicKeyToken=51c551904274ab44"].CreationName;
             // Instantiate the component, so that we can configure it.
             CManagedComponentWrapper instance = metaDataMultipleHash.Instantiate();
 
@@ -89,17 +89,17 @@ namespace GenerateSSISPackage
             instance.ReinitializeMetaData();
 
             // Set suitable defaults
-            metaDataMultipleHash.CustomPropertyCollection["MultipleThreads"](_MultipleThreads_).Value = 1; // Auto
-            metaDataMultipleHash.CustomPropertyCollection["SafeNullHandling"](_SafeNullHandling_).Value = 1; // True
+            metaDataMultipleHash.CustomPropertyCollection["MultipleThreads"].Value = 1; // Auto
+            metaDataMultipleHash.CustomPropertyCollection["SafeNullHandling"].Value = 1; // True
 
             // Create a path from the source component to the new Multiple Hash component
             IDTSPath100 path = pipeline.PathCollection.New();
-            path.AttachPathAndPropagateNotifications(srcComponent.OutputCollection[0](0)(0), metaDataMultipleHash.InputCollection[0](0)(0));
+            path.AttachPathAndPropagateNotifications(srcComponent.OutputCollection[0], metaDataMultipleHash.InputCollection[0]);
 
             // Select which columns are to be hashed
 
             // Grab the input from the Multiple Hash component
-            IDTSInput100 destInput = metaDataMultipleHash.InputCollection[0](0);
+            IDTSInput100 destInput = metaDataMultipleHash.InputCollection[0];
             IDTSVirtualInput100 destVirInput = destInput.GetVirtualInput();
 
             // This just selects all the columns!
@@ -122,12 +122,12 @@ namespace GenerateSSISPackage
 
 
             // Create a new output column
-            IDTSOutputColumn100 outputColumn = instance.InsertOutputColumnAt(metaDataMultipleHash.OutputCollection[0](0).ID, 0, "OutputCol1", "Output Column 1");
+            IDTSOutputColumn100 outputColumn = instance.InsertOutputColumnAt(metaDataMultipleHash.OutputCollection[0].ID, 0, "OutputCol1", "Output Column 1");
             // Set the Hash Type.  The available hashes are 1 = MD5, 2 = RipeMD160, 3 = SHA1, 4 = SHA256, 5 = SHA384, 6 = SHA512, 7 = CRC32, 8 = CRC32C, 9 = FNV1a32, 10 = FNV1a64
-            outputColumn.CustomPropertyCollection["HashType"](_HashType_).Value = 1; // MD5
+            outputColumn.CustomPropertyCollection["HashType"].Value = 1; // MD5
 
             // Set the list of lineage id's that will be hashed for this column.
-            outputColumn.CustomPropertyCollection["InputColumnLineageIDs"](_InputColumnLineageIDs_).Value = lineageIDs;
+            outputColumn.CustomPropertyCollection["InputColumnLineageIDs"].Value = lineageIDs;
 
             // You should add a destination and another Path here from Multiple Hash to the destination.
             // Details for this are http://msdn.microsoft.com/en-us/library/ms136086.aspx
